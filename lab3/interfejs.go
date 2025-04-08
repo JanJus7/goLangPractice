@@ -161,19 +161,39 @@ func (f *DirectoryImpl) Items() []FileSystemItem {
 type SymLink struct {
 	name       string
 	parentPath string
-	targetPath string
+	target FileSystemItem
 	created    time.Time
 	modified time.Time
 }
 
-func NewSymLink(name string, parentPath string, targetPath string) *SymLink {
+func NewSymLink(name string, parentPath string, target FileSystemItem) *SymLink {
 	return &SymLink{
 		name:       name,
 		parentPath: parentPath,
-		targetPath: targetPath,
+		target: target,
 		created:    time.Now(),
 		modified: time.Now(),
 	}
+}
+
+func (s *SymLink) Name() string {
+	return s.name
+}
+
+func (s *SymLink) Path() string {
+	return s.parentPath + "/" + s.name
+}
+
+func (s *SymLink) Size() int64 {
+	return s.target.Size()
+}
+
+func (s *SymLink) CreatedAt() time.Time {
+	return s.created
+}
+
+func (s *SymLink) ModifiedAt() time.Time {
+	return s.modified
 }
 
 type ReadonlyFile struct {
@@ -192,4 +212,36 @@ func NewReadonlyFile(name string, parentPath string) *ReadonlyFile {
 		modified: time.Now(),
 		data:       []byte{},
 	}
+}
+
+func (f *ReadonlyFile) Name() string {
+	return f.name
+}
+
+func (f *ReadonlyFile) Path() string {
+	return f.parentPath + "/" + f.name
+}
+
+func (f *ReadonlyFile) Size() int64 {
+	return int64(len(f.data))
+}	
+
+func (f *ReadonlyFile) CreatedAt() time.Time {
+	return f.created
+}
+
+func (f *ReadonlyFile) ModifiedAt() time.Time {
+	return f.modified
+}
+
+func (f *ReadonlyFile) Read(p []byte) (n int, err error) {
+	if len(f.data) == 0 {
+		return 0, errors.New("no data to read")
+	}
+	n = copy(p, f.data)
+	return n, nil
+}
+
+func (f *ReadonlyFile) Write(p []byte) (int, error) {
+	return 0, ErrPermissionDenied
 }
