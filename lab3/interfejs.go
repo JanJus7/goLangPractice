@@ -1,9 +1,9 @@
 package main
-import (
-	"time"
-	"errors"
-)
 
+import (
+	"errors"
+	"time"
+)
 
 // Iterfejs definiujący obiekt w systemie plików
 type FileSystemItem interface {
@@ -46,8 +46,8 @@ type File struct {
 	name       string
 	parentPath string
 	created    time.Time
-	ModifiedAt time.Time
-	size       int64
+	modified time.Time
+	data       []byte
 }
 
 func NewFile(name string, parentPath string) *File {
@@ -55,16 +55,50 @@ func NewFile(name string, parentPath string) *File {
 		name:       name,
 		parentPath: parentPath,
 		created:    time.Now(),
-		ModifiedAt: time.Now(),
-		size:       0,
+		modified: time.Now(),
+		data:       []byte{},
 	}
+}
+
+func (f *File) Name() string {
+	return f.name
+}
+
+func (f *File) Path() string {
+	return f.parentPath + "/" + f.name
+}
+
+func (f *File) Size() int64 {
+	return int64(len(f.data))
+}
+
+func (f *File) CreatedAt() time.Time {
+	return f.created
+}
+
+func (f *File) ModifiedAt() time.Time {
+	return f.modified
+}
+
+func (f *File) Read(p []byte) (n int, err error) {
+	if len(f.data) == 0 {
+		return 0, errors.New("no data to read")
+	}
+	n = copy(p, f.data)
+	return n, nil
+}
+
+func (f *File) Write(p []byte) (n int, err error) {
+	f.data = append(f.data, p...)
+	f.modified = time.Now()
+	return len(p), nil
 }
 
 type DirectoryImpl struct {
 	name       string
 	parentPath string
-	created	time.Time
-	ModifiedAt time.Time
+	created    time.Time
+	modified time.Time
 	items      []FileSystemItem
 }
 
@@ -73,7 +107,7 @@ func NewDirectory(name string, parentPath string) *DirectoryImpl {
 		name:       name,
 		parentPath: parentPath,
 		created:    time.Now(),
-		ModifiedAt: time.Now(),
+		modified: time.Now(),
 		items:      []FileSystemItem{},
 	}
 }
@@ -83,7 +117,7 @@ type SymLink struct {
 	parentPath string
 	targetPath string
 	created    time.Time
-	ModifiedAt time.Time
+	modified time.Time
 }
 
 func NewSymLink(name string, parentPath string, targetPath string) *SymLink {
@@ -92,7 +126,7 @@ func NewSymLink(name string, parentPath string, targetPath string) *SymLink {
 		parentPath: parentPath,
 		targetPath: targetPath,
 		created:    time.Now(),
-		ModifiedAt: time.Now(),
+		modified: time.Now(),
 	}
 }
 
@@ -100,8 +134,8 @@ type ReadonlyFile struct {
 	name       string
 	parentPath string
 	created    time.Time
-	ModifiedAt time.Time
-	size       int64
+	modified time.Time
+	data       []byte
 }
 
 func NewReadonlyFile(name string, parentPath string) *ReadonlyFile {
@@ -109,10 +143,7 @@ func NewReadonlyFile(name string, parentPath string) *ReadonlyFile {
 		name:       name,
 		parentPath: parentPath,
 		created:    time.Now(),
-		ModifiedAt: time.Now(),
-		size:       0,
+		modified: time.Now(),
+		data:       []byte{},
 	}
 }
-
-
-
