@@ -57,6 +57,28 @@ func main() {
 		fmt.Println("\n'notes.txt' został usunięty.")
 	}
 
+	fmt.Printf("------------------------------------------------------")
+	item, _ := vfs.FindItem("docs")
+	if item != nil {
+		fmt.Printf("\nZnaleziono element: %s (%s)\n", item.Name(), item.Path())
+	} else {
+		fmt.Println("\nNie znaleziono elementu.")
+	}
+
+	item, _ = vfs.FindItem("shortcut")
+	if item != nil {
+		fmt.Printf("\nZnaleziono element: %s (%s)\n", item.Name(), item.Path())
+	} else {
+		fmt.Println("\nNie znaleziono elementu.")
+	}
+
+	item, _ = vfs.FindItem("nonExistentFile.md")
+	if item != nil {
+		fmt.Printf("\nZnaleziono element: %s (%s)\n", item.Name(), item.Path())
+	} else {
+		fmt.Println("\nNie znaleziono elementu.")
+	}
+
 	fmt.Printf("------------------------------------------------------\n")
 	for _, item := range vfs.ListItems() {
 		fmt.Printf("- %s (%s)\n", item.Name(), item.Path())
