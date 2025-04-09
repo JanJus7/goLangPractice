@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"time"
+	"fmt"
 )
 
 // Iterfejs definiujący obiekt w systemie plików
@@ -244,4 +245,151 @@ func (f *ReadonlyFile) Read(p []byte) (n int, err error) {
 
 func (f *ReadonlyFile) Write(p []byte) (int, error) {
 	return 0, ErrPermissionDenied
+}
+
+type VirtualFileSystem struct {
+	root Directory
+}
+
+func NewVirtualFileSystem(root string) *VirtualFileSystem {
+	return &VirtualFileSystem{
+		root: NewDirectory(root, ""),
+	}
+}
+
+func (vfs *VirtualFileSystem) Root() Directory {
+	return vfs.root
+}
+
+func (vfs *VirtualFileSystem) CreateFile(name string, parentPath string) (*File, error) {
+	file := NewFile(name, parentPath)
+	err := vfs.root.AddItem(file)
+	if err != nil {
+		return nil, err
+	}
+	return file, nil
+}
+
+func (vfs *VirtualFileSystem) CreateDirectory(name string, parentPath string) (*DirectoryImpl, error) {
+	dir := NewDirectory(name, parentPath)
+	err := vfs.root.AddItem(dir)
+	if err != nil {
+		return nil, err
+	}
+	return dir, nil
+}
+
+func (vfs *VirtualFileSystem) CreateSymLink(name string, parentPath string, target FileSystemItem) (*SymLink, error) {
+	symLink := NewSymLink(name, parentPath, target)
+	err := vfs.root.AddItem(symLink)
+	if err != nil {
+		return nil, err
+	}
+	return symLink, nil
+}
+func (vfs *VirtualFileSystem) CreateReadonlyFile(name string, parentPath string) (*ReadonlyFile, error) {
+	readonlyFile := NewReadonlyFile(name, parentPath)
+	err := vfs.root.AddItem(readonlyFile)
+	if err != nil {
+		return nil, err
+	}
+	return readonlyFile, nil
+}
+
+func (vfs *VirtualFileSystem) RemoveItem(name string) error {
+	return vfs.root.RemoveItem(name)
+}
+
+func (vfs *VirtualFileSystem) ListItems() []FileSystemItem {
+	return vfs.root.Items()
+}
+
+func (vfs *VirtualFileSystem) FindItem(name string) (FileSystemItem, error) {
+	for _, item := range vfs.root.Items() {
+		if item.Name() == name {
+			return item, nil
+		}
+	}
+	return nil, ErrItemNotFound
+}
+
+func (vfs *VirtualFileSystem) Open(name string) (Readable, error) {
+	item, err := vfs.FindItem(name)
+	if err != nil {
+		return nil, err
+	}
+	if readable, ok := item.(Readable); ok {
+		return readable, nil
+	}
+	return nil, ErrNotImplemented
+}
+
+func (vfs *VirtualFileSystem) Write(name string, data []byte) (int, error) {
+	item, err := vfs.FindItem(name)
+	if err != nil {
+		return 0, err
+	}
+	if writable, ok := item.(Writable); ok {
+		return writable.Write(data)
+	}
+	return 0, ErrNotImplemented
+}
+
+
+
+func main() {
+	vfs := NewVirtualFileSystem("root")
+
+	docsDir, _ := vfs.CreateDirectory("docs", "/root")
+
+
+	file, _ := vfs.CreateFile("notes.txt", docsDir.Path())
+
+
+	data := []byte("I like planes!")
+	n, err := vfs.Write("notes.txt", data)
+	if err != nil {
+		fmt.Println("Błąd zapisu:", err)
+	} else {
+		fmt.Printf("Zapisano %d bajtów do notes.txt\n", n)
+	}
+
+	readable, _ := vfs.Open("notes.txt")
+
+	buf := make([]byte, 1024)
+	n, err = readable.Read(buf)
+	if err != nil {
+		fmt.Println("Błąd odczytu:", err)
+	} else {
+		fmt.Printf("Odczytano z notes.txt: %s\n", string(buf[:n]))
+	}
+
+	readonlyFile, _ := vfs.CreateReadonlyFile("readme.md", docsDir.Path())
+
+
+	_, err = readonlyFile.Write([]byte("Nie wolno pisać!"))
+	if err != nil {
+		fmt.Println("Błąd dla readonly: ", err)
+	}
+
+	symLink, _ := vfs.CreateSymLink("shortcut", docsDir.Path(), file)
+
+	fmt.Printf("Dowiązanie symboliczne %s -> %s\n", symLink.Path(), file.Path())
+	fmt.Printf("------------------------------------------------------\n")
+	for _, item := range vfs.ListItems() {
+		fmt.Printf("- %s (%s)\n", item.Name(), item.Path())
+	}
+
+	fmt.Printf("------------------------------------------------------")
+	err = vfs.RemoveItem("notes.txt")
+	if err != nil {
+		fmt.Println("Błąd usuwania pliku:", err)
+	} else {
+		fmt.Println("\nPlik 'notes.txt' został usunięty.")
+	}
+
+	fmt.Printf("------------------------------------------------------\n")
+	for _, item := range vfs.ListItems() {
+		fmt.Printf("- %s (%s)\n", item.Name(), item.Path())
+	}
 }
