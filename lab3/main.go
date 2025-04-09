@@ -54,7 +54,40 @@ func main() {
 	if err != nil {
 		fmt.Println("Błąd usuwania pliku:", err)
 	} else {
-		fmt.Println("\nPlik 'notes.txt' został usunięty.")
+		fmt.Println("\n'notes.txt' został usunięty.")
+	}
+
+	fmt.Printf("------------------------------------------------------\n")
+	for _, item := range vfs.ListItems() {
+		fmt.Printf("- %s (%s)\n", item.Name(), item.Path())
+	}
+
+	fmt.Printf("------------------------------------------------------")
+	err = vfs.RemoveItem("readme.md")
+	if err != nil {
+		fmt.Println("Błąd usuwania pliku:", err)
+	} else {
+		fmt.Println("\n'readme.md' został usunięty.")
+	}
+
+	err = vfs.RemoveItem("shortcut")
+	if err != nil {
+		fmt.Println("Błąd usuwania dowiązania symbolicznego:", err)
+	} else {
+		fmt.Println("\n'shortcut' został usunięty.")
+	}
+
+	fmt.Printf("------------------------------------------------------\n")
+	for _, item := range vfs.ListItems() {
+		fmt.Printf("- %s (%s)\n", item.Name(), item.Path())
+	}
+
+	fmt.Printf("------------------------------------------------------")
+	err = vfs.RemoveItem("docs")
+	if err != nil {
+		fmt.Println("Błąd usuwania katalogu:", err)
+	} else {
+		fmt.Println("\n'docs' został usunięty.")
 	}
 
 	fmt.Printf("------------------------------------------------------\n")
