@@ -37,21 +37,35 @@ func randomItems() []string {
 func Worker(id int, orders <-chan Order, results chan<- ProcessResult, wg *sync.WaitGroup) {
 	defer wg.Done()
 
+	const maxRetries = 10
+
 	for order := range orders {
 		start := time.Now()
-		processTime := time.Duration(rand.Intn(1000)+500) * time.Millisecond
-		time.Sleep(processTime)
+		attempts := 0
+		success := false
 
-		success := rand.Float32() < 0.8
+		for attempts < maxRetries {
+			attempts++
+			processTime := time.Duration(rand.Intn(1000)+500) * time.Millisecond
+			time.Sleep(processTime)
+
+			success = rand.Float32() < 0.2
+			if success {
+				break
+			}
+
+			fmt.Printf("Worker %d has processed the order #%d (success: %v)\n", id, order.ID, success)
+		}
 
 		result := ProcessResult{
 			OrderID:      order.ID,
 			CustomerName: order.CustomerName,
 			Success:      success,
 			ProcessTime:  time.Since(start),
+			Attempts:     attempts,
 		}
 		if !success {
-			result.Error = fmt.Errorf("error completing the order #%d", order.ID)
+			result.Error = fmt.Errorf("error completing the order #%d after %d attempts", order.ID, attempts)
 		}
 
 		fmt.Printf("Worker %d has processed the order #%d (success: %v)\n", id, order.ID, success)

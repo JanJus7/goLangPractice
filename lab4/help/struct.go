@@ -15,4 +15,5 @@ type ProcessResult struct {
 	Success      bool
 	ProcessTime  time.Duration
 	Error        error
+	Attempts     int
 }
