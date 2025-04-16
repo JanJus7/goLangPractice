@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"lab4/help"
 	"sync"
 )
@@ -12,7 +11,6 @@ const (
 )
 
 func main() {
-	fmt.Println("Witaj w systemie zarządzania zamówieniami!")
 
 	orders := make(chan help.Order, numOrders)
 	results := make(chan help.ProcessResult, numOrders)

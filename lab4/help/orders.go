@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var sampleItems = []string{"Laptop", "Telefon", "Tablet", "Monitor", "Myszka", "Klawiatura"}
+var sampleItems = []string{"Laptop", "Phone", "Tablet", "Monitor", "Mouse", "Keyboard"}
 
 func GenerateOrders(numOrders int, orders chan<- Order) {
 	for i := 1; i <= numOrders; i++ {
