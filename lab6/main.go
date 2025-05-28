@@ -13,8 +13,8 @@ func main() {
 	csvPath := flag.String("csv", "", "Path to csv")
 	outPath := flag.String("out", "output.csv", "Output csv file")
 	smaP := flag.Int("sma", 20, "SMA period")
-	rsiP := flag.Int("rsi", 20, "RSI period")
-	atrP := flag.Int("atr", 20, "ATR period")
+	rsiP := flag.Int("rsi", 21, "RSI period")
+	atrP := flag.Int("atr", 14, "ATR period")
 	flag.Parse()
 
 	if *csvPath == "" {
