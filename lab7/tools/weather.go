@@ -10,3 +10,11 @@ type Weather struct {
     } `json:"daily"`
 }
 
+type HourlyWeather struct {
+	Hourly struct {
+		Time             []string  `json:"time"`
+		Temperature      []float64 `json:"temperature_2m"`
+		Precipitation []float64 `json:"precipitation"`
+		WindSpeed        []float64 `json:"wind_speed_10m"`
+	} `json:"hourly"`
+}
