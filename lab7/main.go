@@ -64,6 +64,11 @@ func main() {
 			}
 		}
 		table.Render()
+
+		tools.GeneratePlot(date, tempMax, "Forecast - Temp Max", "Temp (°C)", "plots/futureTemp.png")
+		tools.GeneratePlot(date, windSpeed, "Forecast - Wind", "Wind (m/s)", "plots/futureWind.png")
+		tools.GeneratePlot(date, rain, "Forecast - Rainfall", "Rainfall (mm)", "plots/futureRain.png")
+
 	} else if *typeOfForcast == "hourly" {
 		date, temp, rain, windSpeed, err := tools.GetHourlyWeatherData(lat, lng)
 		if err != nil {
@@ -84,6 +89,11 @@ func main() {
 			table.Append(row)
 		}
 		table.Render()
+
+		tools.GeneratePlot(date, temp, "Hourly - Temperature", "Temp (°C)", "plots/hourlyTemp.png")
+		tools.GeneratePlot(date, windSpeed, "Hourly - Wind", "Wind (m/s)", "plots/hourlyWind.png")
+		tools.GeneratePlot(date, rain, "Hourly - Rainfall", "Rainfall (mm)", "plots/hourlyRain.png")
+
 	} else if *typeOfForcast == "historical" {
 		date, tempMax, tempMin, windSpeed, rain, err := tools.GetHistoricalWeatherData(lat, lng, *histStartDate, *histEndDate)
 		if err != nil {
@@ -105,5 +115,10 @@ func main() {
 			table.Append(row)
 		}
 		table.Render()
+
+		tools.GeneratePlot(date, tempMax, "Historical - Temp Max", "Temp (°C)", "plots/historicalTemp.png")
+		tools.GeneratePlot(date, windSpeed, "Historical - Wind", "Wind (m/s)", "plots/historicalWind.png")
+		tools.GeneratePlot(date, rain, "Historical - Rainfall", "Rainfall (mm)", "plots/historicalRain.png")
+
 	}
 }
