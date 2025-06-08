@@ -46,8 +46,11 @@ func main() {
 			table.Append(row)
 
 			alerts := []string{}
-			if tempMax[i] >= config.TemperatureThreshold {
+			if tempMax[i] >= config.HighTemperatureThreshold {
 				alerts = append(alerts, fmt.Sprintf("High temperature (%.2f°C)", tempMax[i]))
+			}
+			if tempMin[i] <= config.LowTemperatureThreshold {
+				alerts = append(alerts, fmt.Sprintf("Low temperature (%.2f°C)", tempMin[i]))
 			}
 			if windSpeed[i] >= config.WindThreshold {
 				alerts = append(alerts, fmt.Sprintf("Strong wind (%.2f m/s)", windSpeed[i]))

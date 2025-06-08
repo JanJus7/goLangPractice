@@ -1,7 +1,8 @@
 package tools
 
 type Config struct {
-    TemperatureThreshold float64 `json:"temperatureThreshold"`
+    HighTemperatureThreshold float64 `json:"highTemperatureThreshold"`
+	LowTemperatureThreshold  float64 `json:"lowTemperatureThreshold"`
     WindThreshold        float64 `json:"windThreshold"`
     RainThreshold        float64 `json:"rainThreshold"`
 }
