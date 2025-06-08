@@ -1,5 +1,6 @@
 {
-  "temperatureThreshold": 30,
+  "highTemperatureThreshold": 30,
+  "lowTemperatureThreshold": 0,
   "windThreshold": 15,
   "rainThreshold": 10
 }

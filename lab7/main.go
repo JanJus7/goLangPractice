@@ -19,6 +19,9 @@ func main() {
 
 
 	lat, lng := tools.GetCityData(*city)
+	if lat == "" || lng == "" {
+    	panic(fmt.Errorf("could not find coordinates for city: %s", *city))
+	}
 
 	config, err := tools.LoadConfig("config.json")
 	if err != nil {
