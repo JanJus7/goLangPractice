@@ -1,0 +1,5 @@
+{
+  "temperatureThreshold": 30,
+  "windThreshold": 15,
+  "rainThreshold": 10
+}
